@@ -1,0 +1,210 @@
+<div class="row justify-content-center mb-5">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0">Search Articles</h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <input type="text" id="search-input" class="form-control form-control-lg" placeholder="Start typing to search...">
+          <small class="text-muted">Enter a complete sentence or press Enter when done</small>
+        </div>
+        <div id="search-status" class="mb-3"></div>
+        <div id="search-results"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <h4>Recent Articles</h4>
+    <div class="row">
+      <% @articles.each do |article| %>
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><%= article.title %></h5>
+              <p class="card-text"><%= article.snippet %></p>
+              <%= link_to "Read More", article_path(article), class: "btn btn-sm btn-primary" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const searchStatus = document.getElementById('search-status');
+  const userId = '<%= @user_id %>';
+  
+  let typingTimer;
+  const doneTypingInterval = 2000;
+  let lastQuery = '';
+  let lastRecordedQuery = '';
+  let searchSequence = [];
+  let isSearching = false;
+  let lastCompleteness = null;
+  
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim();
+    
+    if (query === lastQuery) return;
+    
+    if (query && (searchSequence.length === 0 || query !== searchSequence[searchSequence.length - 1])) {
+      searchSequence.push(query);
+    }
+    
+    lastQuery = query;
+    
+    clearTimeout(typingTimer);
+    
+    if (query) {
+      if (!isSearching) {
+        recordSearch(query, false);
+      }
+      
+      typingTimer = setTimeout(() => {
+        if (lastQuery === query && query.length > 2) {
+          if (query !== lastRecordedQuery) {
+            // When user pauses typing, we suggest it might be final
+            recordSearch(query, true);
+          }
+        }
+      }, doneTypingInterval);
+      
+      searchArticles(query);
+    } else {
+      searchResults.innerHTML = '';
+      updateSearchStatus('', '');
+      searchSequence = [];
+      lastCompleteness = null;
+    }
+  });
+  
+  searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim() && this.value.trim().length > 2) {
+      const query = this.value.trim();
+      
+      clearTimeout(typingTimer);
+      // Force complete on Enter key press
+      recordSearch(query, true, true);
+      
+      updateSearchStatus('Processing search...', 'text-primary');
+    }
+  });
+  
+  function recordSearch(query, isFinal, forceComplete = false) {
+    if (isFinal) isSearching = true;
+    
+    fetch('/api/v1/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: JSON.stringify({
+        query: query,
+        is_final: isFinal,
+        force_complete: forceComplete
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        lastCompleteness = data.completeness;
+        
+        // Update UI based on completeness
+        if (data.completeness === 'complete') {
+          updateSearchStatus('Search recorded ✓', 'text-success');
+          lastRecordedQuery = query;
+          searchSequence = [];
+          setTimeout(fetchAndUpdateAnalytics, 500);
+        } else if (data.completeness === 'incomplete') {
+          updateSearchStatus('Incomplete sentence detected ⚠️', 'text-warning');
+        } else {
+          updateSearchStatus('Typing...', 'text-muted');
+        }
+        
+        console.log('Search analysis:', data.analysis);
+      }
+      isSearching = false;
+    })
+    .catch(error => {
+      console.error('Error recording search:', error);
+      isSearching = false;
+      updateSearchStatus('Error recording search', 'text-danger');
+    });
+  }
+  
+  function updateSearchStatus(message, className) {
+    searchStatus.textContent = message;
+    searchStatus.className = className;
+    if (className) {
+      searchStatus.classList.add('mb-3');
+    }
+  }
+  
+  function fetchAndUpdateAnalytics() {
+    fetch('/api/v1/search_analytics')
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'ok') {
+          console.log('Analytics updated');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating analytics:', error);
+      });
+  }
+  
+  function searchArticles(query) {
+    fetch(`/search/query?query=${encodeURIComponent(query)}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        displayResults(data.results);
+      }
+    })
+    .catch(error => {
+      console.error('Error searching articles:', error);
+    });
+  }
+  
+  function displayResults(results) {
+    searchResults.innerHTML = '';
+    
+    if (results.length === 0) {
+      searchResults.innerHTML = '<div class="alert alert-info">No articles found</div>';
+      return;
+    }
+    
+    const resultList = document.createElement('div');
+    resultList.className = 'list-group';
+    
+    results.forEach(article => {
+      const resultItem = document.createElement('a');
+      resultItem.href = `/articles/${article.id}`;
+      resultItem.className = 'list-group-item list-group-item-action';
+      
+      const title = document.createElement('h5');
+      title.className = 'mb-1';
+      title.textContent = article.title;
+      
+      const content = document.createElement('p');
+      content.className = 'mb-1';
+      content.textContent = article.content;
+      
+      resultItem.appendChild(title);
+      resultItem.appendChild(content);
+      resultList.appendChild(resultItem);
+    });
+    
+    searchResults.appendChild(resultList);
+  }
+});
+</script>

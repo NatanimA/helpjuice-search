@@ -1,0 +1,36 @@
+<div class="row mb-4">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0">Articles</h3>
+      </div>
+      <div class="card-body">
+        <p>Browse all available articles in the HelpJuice database.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <% if @articles.empty? %>
+    <div class="col-md-12">
+      <div class="alert alert-info">
+        No articles found. Please check back later.
+      </div>
+    </div>
+  <% else %>
+    <% @articles.each do |article| %>
+      <div class="col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title"><%= article.title %></h5>
+            <p class="card-text"><%= article.content.truncate(200) %></p>
+          </div>
+          <div class="card-footer bg-white">
+            <%= link_to "Read More", article_path(article), class: "btn btn-primary" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
