@@ -1,0 +1,3 @@
+
+Build Command: ./bin/render-build.sh
+Start Command: bundle exec puma -C config/puma.rb
