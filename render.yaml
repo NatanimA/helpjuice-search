@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: helpjuice-search
+    env: ruby
+    buildCommand: bundle install && bundle exec rake assets:precompile && bundle exec rake assets:clean
+    startCommand: bundle exec puma -C config/puma.rb
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: helpjuice-search-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_LOG_TO_STDOUT
+        value: true
+      - key: RAILS_SERVE_STATIC_FILES
+        value: true
+      - key: RACK_ENV
+        value: production
+
+databases:
+  - name: helpjuice-search-db
+    plan: free 
