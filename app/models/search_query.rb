@@ -40,11 +40,9 @@ class SearchQuery < ApplicationRecord
   end
   
   def finish!(final_text = nil)
-    # Use the original query if final_text is blank
     final_text = query if final_text.blank?
     
     begin
-      # Even if update fails, still call cleanup_sequence
       cleanup_sequence(final_text)
       update(completed: true, final_query: final_text)
       true
@@ -88,69 +86,65 @@ class SearchQuery < ApplicationRecord
   def self.appears_complete?(text)
     return false if text.blank? || text.length < 5
     
-    # Normalize text
     text = text.strip.gsub(/\s+/, ' ')
     words = text.split(/\s+/)
     word_count = words.length
     
-    # Very short fragments are not complete sentences
     return false if word_count < 3
     
-    # Definite sentence endings
     if text.match?(/[.!?]$/)
       return true
     end
     
-    # Common complete phrases and patterns based on parts of speech
     phrase_patterns = {
-      # Question patterns
-      question_words: %w(who what where when why how),
-      aux_question_starters: %w(is are was were do does did can could will would should),
+      question_words: %w(who what where when why how which whose whom),
+      aux_question_starters: %w(is are was were do does did can could will would should may might must has have had),
       
-      # Imperative sentence starters
-      imperative_starters: %w(please find search look show tell give go make),
+      imperative_starters: %w(please find search look show tell give go make create list explain describe compare analyze define solve implement),
       
-      # Content nouns that often appear at the end of search queries
       terminal_content_nouns: %w(guide tutorial examples documentation reference manual info information 
-                               steps instructions process method algorithm strategy approach),
+                               steps instructions process method algorithm strategy approach 
+                               software application app program framework library code package module
+                               technique system protocol standard best-practices practices tool toolkit
+                               article blog post video course lecture presentation report review analysis
+                               solution problem error issue bug feature requirement specification),
                                
-      # Prepositions that rarely end complete sentences
-      non_terminal_prepositions: %w(in on at by with for from to of),
+      non_terminal_prepositions: %w(in on at by with for from to of through between among without during before after against under over),
       
-      # Articles that rarely end complete sentences
       non_terminal_articles: %w(a an the),
+
+      non_terminal_conjunctions: %w(and or nor),
       
-      # Phrase completeness indicators - words that suggest completeness when they appear
-      completeness_indicators: %w(and or but so because therefore thus however nevertheless)
+      completeness_indicators: %w(and or but so because therefore thus however nevertheless since although though despite while unless if when),
+      
+      technical_domains: %w(programming coding development software web mobile cloud data database api server frontend backend devops testing),
+      
+      programming_languages: %w(javascript python java ruby c# php go rust typescript swift kotlin scala r)
     }
     
-    # Check for incomplete sentences that end with prepositions or articles
     last_word = words.last.downcase.gsub(/[^\w]/, '')
     if phrase_patterns[:non_terminal_prepositions].include?(last_word) || 
-       phrase_patterns[:non_terminal_articles].include?(last_word)
+       phrase_patterns[:non_terminal_articles].include?(last_word) ||
+       phrase_patterns[:non_terminal_conjunctions].include?(last_word)
       return false
     end
     
-    # Special case for "programming tutorial" and similar terminal words
-    if phrase_patterns[:terminal_content_nouns].include?(last_word)
+    if phrase_patterns[:terminal_content_nouns].include?(last_word) ||
+       phrase_patterns[:technical_domains].include?(last_word) ||
+       phrase_patterns[:programming_languages].include?(last_word)
       return true
     end
     
-    # Check if we have question structure
     first_word_lower = words.first.downcase
     if phrase_patterns[:question_words].include?(first_word_lower) || 
        phrase_patterns[:aux_question_starters].include?(first_word_lower)
-      # Question should have subject and verb
       return word_count >= 4
     end
     
-    # Check for imperative sentences
     if phrase_patterns[:imperative_starters].include?(first_word_lower)
-      # Imperative needs an object
       return word_count >= 3
     end
     
-    # Check for presence of completeness indicators in the middle
     middle_words = words[1...-1]
     middle_words.each do |word|
       clean_word = word.downcase.gsub(/[^\w]/, '')
@@ -159,34 +153,30 @@ class SearchQuery < ApplicationRecord
       end
     end
     
-    # Structure-based checks
-    
-    # Minimum length for a simple sentence with subject-verb-object
     if word_count >= 5
       return true
     end
 
-    # If the query ends with a noun phrase (e.g., "The best programming language")
-    # it's likely a complete search intent even without a verb
     if word_count >= 4 && !phrase_patterns[:non_terminal_prepositions].include?(last_word)
       return true
     end
     
-    # Very short phrases need more scrutiny
     if word_count <= 3
-      # Phrases like "The Importance of" - preposition suggests incompleteness
       if phrase_patterns[:non_terminal_prepositions].include?(last_word)
         return false
       end
       
-      # Incomplete phrases like "The Best" - too vague
       if text.match?(/^the\s+[a-z]+$/i) && word_count == 2
         return false
       end
+      
+      if phrase_patterns[:programming_languages].include?(last_word) || 
+         phrase_patterns[:technical_domains].include?(last_word)
+        return true
+      end
     end
     
-    # Default: longer phrases are more likely to be complete
-    text.length > 25
+    text.length > 20
   end
   
   private
@@ -208,13 +198,11 @@ class SearchQuery < ApplicationRecord
     return if user_id.blank? || final_query.blank?
     
     begin
-      # Delete incomplete queries in same sequence
       incomplete_count = delete_incomplete_queries(user_id, final_query)
       if incomplete_count > 0
         Rails.logger.info "Cleaned up #{incomplete_count} partial queries for user #{user_id}"
       end
       
-      # Merge similar completed queries
       similar = merge_similar_queries(user_id, final_query)
       if similar > 0
         Rails.logger.info "Merged #{similar} similar queries to '#{final_query}'"
@@ -246,7 +234,6 @@ class SearchQuery < ApplicationRecord
     count
   end
   
-  # For backward compatibility
   class << self
     alias_method :find_or_initialize_for_user, :track_query 
     alias_method :analytics_for_user, :user_stats
@@ -255,7 +242,6 @@ class SearchQuery < ApplicationRecord
     alias_method :cleanup_sequence, :cleanup_related_queries
   end
   
-  # For backward compatibility
   alias_method :complete, :finish!
   alias_method :cleanup_related_queries, :cleanup_sequence
 end

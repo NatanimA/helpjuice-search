@@ -12,32 +12,24 @@ module Api
           return render json: { status: :empty, message: "Query cannot be empty" }
         end
         
-        # Truncate long queries (protect DB)
         query = query[0...255] if query.length > 255
         
-        # Check if this is a final query (from client) and if it appears complete
         is_final_from_client = params[:is_final].to_s == "true"
         force_final = params[:force_complete].to_s == "true"
         
-        # Only perform completeness check if not forcing completion
         appears_complete = force_final ? false : SearchQuery.appears_complete?(query)
         
-        # Log detailed analysis
         log_completeness_analysis(query, appears_complete)
         
-        # Only consider it final if both conditions are met, or if explicitly forced
         is_final = is_final_from_client && appears_complete
         
         begin
-          # Look for existing incomplete query that might be related
           recent_query = find_recent_query(query, user_id)
           
           if recent_query
-            # Update existing query
             search_query = recent_query
             search_query.query = query
           else
-            # Create new query
             search_query = SearchQuery.new(query: query, user_identifier: user_id, completed: false)
           end
           
@@ -47,8 +39,6 @@ module Api
             return error_response(error_msg)
           end
           
-          # This is the important part: determine if this query should be marked as completed
-          # Force complete overrides, otherwise both client final and appears complete must be true
           should_complete = force_final || (is_final_from_client && appears_complete)
           
           completeness_info = {
@@ -57,16 +47,13 @@ module Api
             client_marked_final: is_final_from_client
           }
           
-          # Handle status determination
           if should_complete
             Rails.logger.info "RECORDING SEARCH: '#{query}' (#{user_id}) - appears complete: #{appears_complete}"
             search_query.update(completed: true, final_query: query)
             completeness_status = :complete
           else
-            # Only log "incomplete" when client thinks it's final but we disagree
             if is_final_from_client && !appears_complete
               Rails.logger.info "REJECTED INCOMPLETE: '#{query}'"
-              # Important: Mark as NOT completed for incomplete queries, even if client marked final
               search_query.update(completed: false)
               completeness_status = :incomplete
             else
@@ -74,7 +61,6 @@ module Api
             end
           end
           
-          # Make sure to reload so we get updated values
           search_query.reload
           
           render json: { 
