@@ -131,6 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         console.log('Search analysis:', data.analysis);
+        
+        // Always fetch and update analytics on any search
+        setTimeout(fetchAndUpdateAnalytics, 500);
       }
       isSearching = false;
     })

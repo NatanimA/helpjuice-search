@@ -12,7 +12,7 @@ bundle install
 bundle exec rake assets:precompile
 bundle exec rake assets:clean
 
-# Create SQLite database directory if it doesn't exist
+# Create database directory if it doesn't exist
 mkdir -p db
 
 # Run migrations

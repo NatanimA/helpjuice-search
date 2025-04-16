@@ -17,11 +17,11 @@ module Api
         is_final_from_client = params[:is_final].to_s == "true"
         force_final = params[:force_complete].to_s == "true"
         
-        appears_complete = force_final ? false : SearchQuery.appears_complete?(query)
+        appears_complete = force_final ? true : SearchQuery.appears_complete?(query)
         
         log_completeness_analysis(query, appears_complete)
         
-        is_final = is_final_from_client && appears_complete
+        is_final = force_final || (is_final_from_client && appears_complete)
         
         begin
           recent_query = find_recent_query(query, user_id)
@@ -47,8 +47,8 @@ module Api
             client_marked_final: is_final_from_client
           }
           
-          if should_complete
-            Rails.logger.info "RECORDING SEARCH: '#{query}' (#{user_id}) - appears complete: #{appears_complete}"
+          if should_complete || force_final
+            Rails.logger.info "RECORDING SEARCH: '#{query}' (#{user_id}) - appears complete: #{appears_complete}, force complete: #{force_final}"
             search_query.update(completed: true, final_query: query)
             completeness_status = :complete
           else
