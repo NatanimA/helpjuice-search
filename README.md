@@ -1,100 +1,247 @@
-# HelpJuice Search
+<a name="readme-top"></a>
 
-A real-time search analytics application built with Ruby on Rails and Vanilla JavaScript.
+<!--
+HOW TO USE:
+This is an example of how you may give instructions on setting up your project locally.
 
-## Overview
+Modify this file to match your project and remove sections that don't apply.
 
-HelpJuice Search is a sophisticated search engine that not only provides instant search results but also records and analyzes search patterns. The application focuses on tracking what users are searching for in real-time and provides analytics on search trends.
+REQUIRED SECTIONS:
+- Table of Contents
+- About the Project
+  - Built With
+  - Live Demo
+- Getting Started
+- Authors
+- Future Features
+- Contributing
+- Show your support
+- Acknowledgements
+- License
 
-### Key Features
+OPTIONAL SECTIONS:
+- FAQ
 
-- **Real-time Search**: Instantly search for articles as you type
-- **Smart Query Recording**: Records final search queries, avoiding the "pyramid problem"
-- **User-specific Analytics**: Track and display search patterns for individual users
-- **Overall Analytics**: View the most popular search terms across all users
-- **Article Management**: Browse and view articles in the system
+After you're finished please remove all the comments and instructions!
+-->
 
-## Technical Details
+<div align="center">
+  <!-- You are encouraged to replace this logo with your own! Otherwise you can also remove it. -->
+  <img src="murple_logo.png" alt="logo" width="140"  height="auto" />
+  <br/>
 
-### Technology Stack
+  <h1><b>Helpjuice Search System</b></h1>
 
-- **Backend**: Ruby on Rails 8.0
-- **Frontend**: Vanilla JavaScript, Bootstrap 5
-- **Database**: PostgreSQL
-- **Testing**: RSpec
+</div>
 
-### How It Works
+<!-- TABLE OF CONTENTS -->
 
-1. **Real-time Search**: As users type in the search box, their input is sent to the server in real-time.
-2. **Query Recording**: The system records search queries but intelligently identifies when a search is "complete" based on user pauses.
-3. **Search Analytics**: The system aggregates and analyzes search patterns, both per-user and globally.
-4. **Scalability**: The application is designed to handle thousands of requests per hour with efficient query processing and database indexing.
+# 📗 Table of Contents
 
-### Search Algorithm
+- [📖 About the Project](#about-project)
+  - [🛠 Built With](#built-with)
+    - [Tech Stack](#tech-stack)
+    - [Key Features](#key-features)
+  - [🚀 Live Demo](#live-demo)
+- [💻 Getting Started](#getting-started)
+  - [Setup](#setup)
+  - [Prerequisites](#prerequisites)
+  - [Install](#install)
+  - [Usage](#usage)
+  - [Run tests](#run-tests)
+  - [Deployment](#triangular_flag_on_post-deployment)
+- [👥 Authors](#authors)
+- [🔭 Future Features](#future-features)
+- [🤝 Contributing](#contributing)
+- [⭐️ Show your support](#support)
+- [🙏 Acknowledgements](#acknowledgements)
+- [❓ FAQ (OPTIONAL)](#faq)
+- [📝 License](#license)
 
-The search system solves the "pyramid problem" by:
-- Recording all search queries in real-time
-- Identifying when a search sequence is complete (when the user pauses)
-- Only treating the final query in a sequence as a "complete" search
-- Filtering out intermediate searches that are just parts of the final query
+<!-- PROJECT DESCRIPTION -->
 
-This approach ensures that analytics show meaningful search patterns rather than counting every keystroke as a separate search.
+# 📖 Helpjuice Search <a name="about-project"></a>
 
-## Development
+**Helpjuice Search** is an advanced search system that analyzes user queries for completeness and provides intelligent search analytics. The system tracks search queries, determines if they appear complete, and generates insights on search patterns and user behavior.
+
+## 🛠 Built With <a name="built-with"></a>
+
+### Tech Stack <a name="tech-stack"></a>
+
+<details>
+  <summary>Server</summary>
+  <ul>
+    <li><a href="https://rubyonrails.org/">Ruby on Rails</a></li>
+  </ul>
+</details>
+
+<details>
+<summary>Database</summary>
+  <ul>
+    <li><a href="https://www.postgresql.org/">PostgreSQL</a></li>
+  </ul>
+</details>
+
+<!-- Features -->
+
+### Key Features <a name="key-features"></a>
+
+- **Query Completeness Analysis** - Intelligently determines if a search query appears complete based on linguistic patterns
+- **Search History Tracking** - Records and analyzes user search behaviors and patterns
+- **Analytics Dashboard** - Provides insights on most frequent searches and user-specific analytics
+- **RESTful API** - Complete API endpoints for search, analytics, and insights
+- **Robust Error Handling** - Comprehensive validation and error management
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- LIVE DEMO -->
+
+## 🚀 Live Demo <a name="live-demo"></a>
+
+> Add a link to your deployed project.
+
+- [Live Demo Link](https://yourdeployedapplicationlink.com)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- GETTING STARTED -->
+
+## 💻 Getting Started <a name="getting-started"></a>
+
+To get a local copy up and running, follow these steps.
 
 ### Prerequisites
 
-- Ruby 3.4+
+In order to run this project you need:
+
+- Ruby (version 3.0.0 or later)
+- Rails (version 7.0.0 or later)
 - PostgreSQL
-- Node.js & Yarn
+- Bundler
 
 ### Setup
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/helpjuice_search.git
-cd helpjuice_search
+Clone this repository to your desired folder:
 
-# Install dependencies
-bundle install
-
-# Setup database
-rails db:create
-rails db:migrate
-rails db:seed
-
-# Start the server
-rails server
+```sh
+  git clone git@github.com:NatanimA/helpjuice-search.git
+  cd helpjuice-search
 ```
 
-### Running Tests
+### Install
 
-```bash
-# Run all tests
-bundle exec rspec
+Install this project with:
 
-# Run specific tests
-bundle exec rspec spec/models/search_query_spec.rb
+```sh
+  bundle install
+  rails db:create
+  rails db:migrate
+  rails db:seed
 ```
 
-## Deployment
+### Usage
 
-The application is designed to be deployed on Heroku or any other platform that supports Rails applications.
+To run the project, execute the following command:
 
-### Heroku Deployment
-
-```bash
-heroku create helpjuice-search
-git push heroku main
-heroku run rails db:migrate
-heroku run rails db:seed
+```sh
+  rails server
 ```
 
-## License
+The application will be available at `http://localhost:3000`
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+### Run tests
 
-## Acknowledgements
+To run tests, run the following command:
 
-- Built for HelpJuice as a technical assessment
-- Uses Bootstrap for UI components
+```sh
+  bundle exec rspec
+```
+
+### Deployment
+
+You can deploy this project using:
+
+<!--
+Example:
+
+```sh
+
+```
+ -->
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- AUTHORS -->
+
+## 👥 Authors <a name="authors"></a>
+
+👤 **Natanim Abesha**
+
+- GitHub: [@NatanimA](https://github.com/NatanimA)
+- Email: [natanimabesha@gmail.com](mailto:natanimabesha@gmail.com)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- FUTURE FEATURES -->
+
+## 🔭 Future Features <a name="future-features"></a>
+
+- [ ] **Machine Learning Integration** - Enhance search completeness analysis with ML algorithms
+- [ ] **Real-time Search Suggestions** - Provide intelligent autocomplete suggestions as users type
+- [ ] **Advanced Search Analytics** - More detailed insights into search patterns and behaviors
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- CONTRIBUTING -->
+
+## 🤝 Contributing <a name="contributing"></a>
+
+Contributions, issues, and feature requests are welcome!
+
+Feel free to check the [issues page](https://github.com/NatanimA/helpjuice-search/issues).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- SUPPORT -->
+
+## ⭐️ Show your support <a name="support"></a>
+
+If you like this project, please give it a ⭐️ on GitHub!
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- ACKNOWLEDGEMENTS -->
+
+## 🙏 Acknowledgments <a name="acknowledgements"></a>
+
+> Give credit to everyone who inspired your codebase.
+
+I would like to thank...
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- FAQ (optional) -->
+
+## ❓ FAQ (OPTIONAL) <a name="faq"></a>
+
+> Add at least 2 questions new developers would ask when they decide to use your project.
+
+- **[Question_1]**
+
+  - [Answer_1]
+
+- **[Question_2]**
+
+  - [Answer_2]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- LICENSE -->
+
+## 📝 License <a name="license"></a>
+
+This project is [MIT](./LICENSE) licensed.
+
+_NOTE: we recommend using the [MIT license](https://choosealicense.com/licenses/mit/) - you can set it up quickly by [using templates available on GitHub](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-license-to-a-repository). You can also use [any other license](https://choosealicense.com/licenses/) if you wish._
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
