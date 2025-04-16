@@ -10,7 +10,7 @@ gem "propshaft"
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1", group: [:development, :test]
 # Use sqlite3 for production on Render free tier
-gem "sqlite3", "~> 1.6", group: :production
+gem "sqlite3", "~> 2.1", group: :production
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "~> 6.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
