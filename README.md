@@ -3,7 +3,7 @@
 
 <div align="center">
 
-  <img src="murple_logo.png" alt="logo" width="140"  height="auto" />
+  <img src="./helpj.png" alt="logo" width="140"  height="auto" />
   <br/>
 
   <h1><b>Helpjuice Search System</b></h1>
