@@ -10,4 +10,7 @@ bundle exec rake assets:clean
 mkdir -p db
 
 # Run migrations
-bundle exec rake db:migrate 
+bundle exec rake db:migrate
+
+# Seed the database with initial data
+bundle exec rake db:seed 
