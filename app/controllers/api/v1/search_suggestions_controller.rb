@@ -46,7 +46,7 @@ module Api
         return [] if query.blank?
         
         suggestions = SearchQuery
-          .where("query LIKE ?", "%#{escape_like(query)}%")
+          .where("query ILIKE ?", "%#{escape_like(query)}%")
           .where(completed: true)
           .group(:query)
           .order("count_all DESC")

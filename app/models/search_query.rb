@@ -189,7 +189,7 @@ class SearchQuery < ApplicationRecord
   def self.in_progress_query(query, user_id)
     where(user_identifier: user_id)
       .incomplete
-      .where("LOWER(query) = LOWER(?) OR LOWER(?) LIKE CONCAT(LOWER(query), '%') OR LOWER(query) LIKE CONCAT(LOWER(?), '%')", 
+      .where("query ILIKE ? OR ? ILIKE CONCAT(query, '%') OR query ILIKE CONCAT(?, '%')", 
             query, query, query)
       .recent
       .first
@@ -216,7 +216,7 @@ class SearchQuery < ApplicationRecord
   def self.delete_incomplete_queries(user_id, final_query)
     count = for_user(user_id)
       .incomplete
-      .where("LOWER(?) LIKE CONCAT(LOWER(query), '%') OR LOWER(query) LIKE CONCAT(LOWER(?), '%')", 
+      .where("? ILIKE CONCAT(query, '%') OR query ILIKE CONCAT(?, '%')", 
             final_query, final_query)
       .delete_all
     
@@ -227,7 +227,7 @@ class SearchQuery < ApplicationRecord
     similar = for_user(user_id)
       .completed
       .where.not(final_query: final_query)
-      .where("LOWER(final_query) LIKE CONCAT(LOWER(?), '%') OR LOWER(?) LIKE CONCAT(LOWER(final_query), '%')",
+      .where("final_query ILIKE CONCAT(?, '%') OR ? ILIKE CONCAT(final_query, '%')",
             final_query, final_query)
     
     count = similar.count
