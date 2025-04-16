@@ -6,9 +6,4 @@ services:
     startCommand: "bundle exec puma -C config/puma.rb"
     envVars:
       - key: RAILS_MASTER_KEY
-        sync: false
-
-databases:
-  - name: helpjuice_search_db
-    databaseName: helpjuice_search
-    user: helpjuice_search 
+        sync: false 
