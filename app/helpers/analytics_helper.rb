@@ -7,6 +7,7 @@ module AnalyticsHelper
     
     limit ? formatted.first(limit) : formatted
   end
+
   
   def percentage_of_total(count, total, decimal_places = 1)
     return 0 if total == 0
