@@ -74,7 +74,7 @@
 
 > Add a link to your deployed project.
 
-- [Helpjuice](https://helpjuice-search-kf65.onrender.com/)
+- [Helpjuice](https://helpjuice-search-kvmz.onrender.com/analytics)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
