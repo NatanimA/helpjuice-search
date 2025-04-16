@@ -2,6 +2,7 @@ class SearchQuery < ApplicationRecord
   validates :query, presence: true, length: { maximum: 255 }
   validates :user_identifier, presence: true
 
+  
   scope :completed, -> { where(completed: true) }
   scope :for_user, ->(user_id) { where(user_identifier: user_id) }
   scope :incomplete, -> { where(completed: false) }
